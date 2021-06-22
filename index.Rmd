@@ -1,7 +1,7 @@
 ---
 title: "Euro 2020 Soccer Play Birth Months"
 description: |
-  Welcome to the website. I hope you enjoy it!
+  Examination of the birth of players at the Euro 2020
 site: distill::distill_website
 ---
 
@@ -16,19 +16,23 @@ library(distill)
 ```
 
 ```{r}
-raw_data <- read_csv("soccer_data.csv")
-
-clean_data <- raw_data %>% 
-  mutate(month = as.integer(str_sub(value, 7, 8))) %>%
-  mutate(month = month.abb[month]) %>% 
-  group_by(month) %>% 
-  summarise(frequency = n())
+playerdata <- read_csv("soccer_data.csv" )
 ```
 
 ```{r}
-clean_data %>% 
-  ggplot(aes(month, frequency)) +
-  geom_col() +
-  scale_x_discrete() +
-  labs(title = "Distribution of Birth Months Among EUFA Euro 2020 Players")
+playerdata %>% 
+  mutate(date = parse_date(str_sub(value, 2, 11))) %>% 
+  mutate(raw_month = months(date)) %>% 
+  mutate(month = parse_factor(raw_month, levels = month.name)) %>% 
+  group_by(month) %>% 
+  summarize(total = n()) %>% 
+  ggplot(aes(x = fct_rev(month), y = total)) +
+    geom_col() +
+    coord_flip() +
+    labs(title = "Euro 2020 Soccer Player Birth Months",
+         subtitle = "Elite players are not more likely to be born in January",
+         caption = "Data from Wikipedia",
+         x = NULL,
+         y = "Number")
 ```
+
