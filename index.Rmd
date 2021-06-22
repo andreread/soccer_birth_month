@@ -1,0 +1,34 @@
+---
+title: "Euro 2020 Soccer Play Birth Months"
+description: |
+  Welcome to the website. I hope you enjoy it!
+site: distill::distill_website
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(dplyr)
+library(distill)
+```
+
+```{r}
+raw_data <- read_csv("soccer_data.csv")
+
+clean_data <- raw_data %>% 
+  mutate(month = as.integer(str_sub(value, 7, 8))) %>%
+  mutate(month = month.abb[month]) %>% 
+  group_by(month) %>% 
+  summarise(frequency = n())
+```
+
+```{r}
+clean_data %>% 
+  ggplot(aes(month, frequency)) +
+  geom_col() +
+  scale_x_discrete() +
+  labs(title = "Distribution of Birth Months Among EUFA Euro 2020 Players")
+```
